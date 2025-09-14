@@ -1,19 +1,27 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotEnv = require("dotenv");
+const app = require('./app');
 
-dotEnv.config({path: "./config/.env"});
+console.log(app.get("env"));
 
-const app = express();
-app.use(express.json());
+dotEnv.config({path: "./config.env"});
 
-//connect to db
-mongoose.connect(process.env.DATABASE)
-.then(() => console.log("DB connected"))
-.catch(err => console.log(err));
 
-const todoRoutes = require("./routes/todoRoutes");
-app.use("/api/todos",todoRoutes);
+const DB = process.env.DATABASE.replace("<PASSWORD>",process.env.DATABASE_PASSWORD);
+
+mongoose.connect(DB)
+  .then(() => {
+    console.log("DB connection successful");
+  })
+  .catch(err => {
+    console.error("DB connection error:", err);
+  });
+
+
+
+// const todoRoutes = require("./routes/todoRoutes.js");
+// app.use("/api/todos",todoRoutes);
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
